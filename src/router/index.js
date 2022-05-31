@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import PasswordsView from '../views/PasswordsView.vue'
 import FilesView from '../views/FilesView.vue'
+import store from '@/store.js'
 
 Vue.use(VueRouter)
 
@@ -40,6 +41,12 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to, _from, next) => {
+  if (to.name !== 'login' && store.state.user.token === '') {
+    next({ name: 'login' })
+  } else next();
 })
 
 export default router

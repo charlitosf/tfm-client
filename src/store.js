@@ -13,6 +13,11 @@ export default new Vuex.Store({
             publicKey: '',
         }
     },
+    getters: {
+        isAuthenticated() {
+            return this.$store.state.user.token !== '';
+        }
+    },
     mutations: {
         setUser(state, user) {
             state.user = user
@@ -28,6 +33,16 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        
+        async login({ commit }, credentials) {
+            try {
+                const response = await Vue.axios.post(process.env.VUE_APP_REMOTE_HOST, credentials)
+                console.log(response);
+                commit('setUser', response.data)
+                return response.data
+            } catch (error) {
+                console.log(error);
+                throw error
+            }
+        }
     },
 })
