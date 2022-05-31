@@ -18,7 +18,7 @@
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            User
+            <!-- {{this.store.name}} -->
           </template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
@@ -29,6 +29,26 @@
   <router-view/>
 </div>
 </template>
+
+<script>
+import { mapActions } from 'vuex'
+
+
+export default {
+  name: 'App',
+  data() {
+    return {
+      
+    }
+  },
+  methods: {
+    ...mapActions([
+      'setUser',
+      'unsetUser'
+    ]) 
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
