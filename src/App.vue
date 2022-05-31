@@ -32,7 +32,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-
+import store from '@/store'
 
 export default {
   name: 'App',
@@ -41,6 +41,7 @@ export default {
       
     }
   },
+  store,
   methods: {
     ...mapActions([
       'setUser',

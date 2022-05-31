@@ -3,9 +3,12 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+import CryptoES from 'crypto-es'
+
 export default new Vuex.Store({
     state: {
         user: {
+            username: '',
             name: '',
             email: '',
             token: '',
@@ -33,16 +36,26 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        async login({ commit }, credentials) {
-            try {
-                const response = await Vue.axios.post(process.env.VUE_APP_REMOTE_HOST, credentials)
-                console.log(response);
-                commit('setUser', response.data)
-                return response.data
-            } catch (error) {
-                console.log(error);
-                throw error
-            }
+        async signup({ commit }, user) {
+            const hash = CryptoES.SHA3("xdd")
+            commit('setUser', user)
+            console.log(hash);
+            // try {
+            //     const response = await Vue.axios.post(process.env.VUE_APP_REMOTE_HOST, {
+            //         password: loginKey,
+            //         username: user.username,
+            //         name: user.name,
+            //         email: user.email,
+            //         publicKey: encodedPublicKey,
+            //         privateKey: encryptedPrivateKey,
+            //     })
+            //     console.log(response);
+            //     commit('setUser', response.data)
+            //     return response.data
+            // } catch (error) {
+            //     console.log(error);
+            //     throw error
+            // }
         }
     },
 })

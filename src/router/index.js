@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
 import PasswordsView from '../views/PasswordsView.vue'
 import FilesView from '../views/FilesView.vue'
 import store from '@/store.js'
@@ -28,6 +29,11 @@ const routes = [
     component: LoginView
   },
   {
+    path: '/signup',
+    name: 'signup',
+    component: SignupView
+  },
+  {
     path: '/passwords',
     name: 'passwords',
     component: PasswordsView
@@ -44,7 +50,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  if (to.name !== 'login' && store.state.user.token === '') {
+  if (to.name !== 'login' && to.name !== 'signup' && store.state.user.token === '') {
     next({ name: 'login' })
   } else next();
 })
