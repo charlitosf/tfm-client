@@ -1,14 +1,16 @@
 <template>
-  <div>
+<div>
   <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-navbar-brand href="#">ISS</b-navbar-brand>
+    <b-navbar-brand><router-link to="/">ISS</router-link></b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item href="#/passwords">Contraseñas</b-nav-item>
-        <b-nav-item href="#/files">Archivos</b-nav-item>
+        <b-nav-item><router-link to="/">Home</router-link></b-nav-item>
+        <b-nav-item><router-link to="/passwords">Passwords</router-link></b-nav-item>
+        <b-nav-item><router-link to="/files">Files</router-link></b-nav-item>
+        <b-nav-item><router-link to="/about">About</router-link></b-nav-item>
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
@@ -24,46 +26,29 @@
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
-  <component :is="currentView"></component>
+  <router-view/>
 </div>
 </template>
 
-<script>
-
-import HomePage from './pages/HomePage.vue'
-import Passwords from './pages/PasswordsPage.vue'
-import Files from './pages/FilesPage.vue'
-import NotFound from './pages/NotFound.vue'
-
-const routes = {
-  '/': {
-    component: HomePage
-  },
-  '/passwords': {
-    component: Passwords
-  },
-  '/files': {
-    component: Files
-  },
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
 }
 
-export default {
-  name: 'ISS',
-  data() {
-    return {currentRoute: window.location.pathname}
-  },
-  computed: {
-    ViewComponent () {
-      const route = routes[this.currentRoute]
-      return route ? route.component : NotFound
+nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
     }
-  },
-  render (h) {
-    return h(this.ViewComponent)
   }
 }
-</script>
-
-<style>
-
 </style>
