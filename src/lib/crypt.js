@@ -28,8 +28,8 @@ export default class Crypt {
 
     // Export key to raw format base64 encoded
     static async exportKey(key) {
-        let jwk = await window.crypto.subtle.exportKey('raw', key);
-        return this.encodeBase64(new Uint8Array(jwk));
+        let rawKey = await window.crypto.subtle.exportKey('raw', key);
+        return this.encodeBase64(new Uint8Array(rawKey));
     }
 
     // Import key from an ArrayBuffer
@@ -55,20 +55,21 @@ export default class Crypt {
         const bytes = Crypt.utf8Encode(str);        
 
         // Concat counter and bytes
-        const totalBytes = new Uint8Array(bytes.length + counter.length);
+        const totalBytes = new Uint8Array(counter.length + bytes.length);
         totalBytes.set(counter);
-        totalBytes.set(bytes, counter.length);
         
-        const ciphertext = await crypto.subtle.encrypt(
+        let ciphertext = await crypto.subtle.encrypt(
             {
                 name: "AES-CTR",
                 counter,
-                length: AES_IV_LENGTH/2,
+                length: AES_IV_LENGTH * 4,
             },
             key,
-            totalBytes
+            bytes
         );
-        return new Uint8Array(ciphertext);
+        ciphertext = new Uint8Array(ciphertext);
+        totalBytes.set(ciphertext, counter.length);
+        return totalBytes;
     }
 
     // Decrypts a string using the AES-256 algorithm with subtle crypto.
@@ -85,7 +86,7 @@ export default class Crypt {
             key,
             bytes.slice(AES_IV_LENGTH)
         );
-        return this.utf8Decode(plaintext);
+        return this.utf8Decode(new Uint8Array(plaintext));
     }
 
     // Generate a pair of RSA keys
@@ -154,7 +155,7 @@ export default class Crypt {
             "pkcs8",
             key
         );
-        const encryptedKey = await this.encryptAES(this.encodeBase64(exportedKey), symKey);
+        const encryptedKey = await this.encryptAES(this.encodeBase64(new Uint8Array(exportedKey)), symKey);
         return this.encodeBase64(encryptedKey);
     }
 
@@ -167,9 +168,12 @@ export default class Crypt {
         return crypto.subtle.importKey(
             "pkcs8",
             decodedKey,
-            "RSA-OAEP",
+            {
+                name: "RSA-OAEP",
+                hash: "SHA-256" ,
+            },
             true,
-            ["encrypt"]
+            ["decrypt"]
         );
     }
 
@@ -188,7 +192,10 @@ export default class Crypt {
         return crypto.subtle.importKey(
             "spki",
             decodedKey,
-            "RSA-OAEP",
+            {
+                name: "RSA-OAEP",
+                hash: "SHA-256",
+            },
             false,
             ["encrypt"]
         );

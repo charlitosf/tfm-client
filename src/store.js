@@ -15,6 +15,7 @@ export default new Vuex.Store({
             token: '',
             privateKey: '',
             publicKey: '',
+            dataKey: '',
         }
     },
     getters: {
@@ -36,6 +37,7 @@ export default new Vuex.Store({
                 token: '',
                 privateKey: '',
                 publicKey: '',
+                dataKey: '',
             }
         }
     },
@@ -67,11 +69,58 @@ export default new Vuex.Store({
                         privateKey: ciphPrivKey,
                     })
                 })
-                const r = await response.json();
-                commit('doNothing');
-                return r.otp;
+                if (response.ok) {
+                    const r = await response.json();
+                    commit('doNothing');
+                    return r.otp;
+                } else {
+                    return false;
+                }
             } catch (error) {
-                console.log(error);
+                return false;
+            }
+        },
+        async login({ commit }, credentials) {
+            const passHash = await Crypt.digestSHA512(credentials.password);
+            let loginK = passHash.slice(0, 32);
+            let dataKey = passHash.slice(32);
+
+            let loginKey = await Crypt.createKeyFromRaw(loginK);
+            dataKey = await Crypt.createKeyFromRaw(dataKey);
+            loginKey = await Crypt.exportKey(loginKey);
+            
+            try {
+                const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/auth/login", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        password: loginKey,
+                        username: credentials.username,
+                        totp: credentials.totp,
+                    })
+                })
+                if (response.ok) {
+                    const r = await response.json();
+                    const decPublicKey = await Crypt.importRSAPublicKey(r.user.publicKey);
+                    const decPrivKey = await Crypt.decodeRSAPrivateKey(r.user.privateKey, dataKey);
+                    const user = {
+                        username: credentials.username,
+                        name: r.user.name,
+                        email: r.user.email,
+                        token: r.token,
+                        privateKey: decPrivKey,
+                        publicKey: decPublicKey,
+                        dataKey: dataKey,
+                    }
+                    commit('setUser', user);
+                    return true;
+                } else {
+                    commit('unsetUser');
+                    return false;
+                }
+            } catch (error) {
                 return false;
             }
         }

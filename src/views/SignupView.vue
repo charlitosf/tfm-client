@@ -5,8 +5,8 @@
     </div>
 
     <div>
-      <b-alert v-model="error" variant="danger" dismissible>Login failed</b-alert>
-      <b-alert v-model="successful" variant="success" dismissible>Login successful!</b-alert>
+      <b-alert v-model="error" variant="danger" dismissible>Signun failed</b-alert>
+      <b-alert v-model="successful" variant="success" dismissible>Signup successful!</b-alert>
     </div>
 
     
@@ -16,6 +16,7 @@
           id="input-3"
           v-model="form.name"
           placeholder="Enter your full name"
+          autocomplete="name"
           required
         ></b-form-input>
       </b-form-group>
@@ -30,6 +31,7 @@
           v-model="form.email"
           type="email"
           placeholder="Enter email"
+          autocomplete="email"
           required
         ></b-form-input>
       </b-form-group>
@@ -39,6 +41,7 @@
           id="input-2"
           v-model="form.username"
           placeholder="Enter username"
+          autocomplete="username"
           required
         ></b-form-input>
       </b-form-group>
@@ -51,6 +54,7 @@
           v-model="form.password"
           placeholder="Enter password"
           type="password"
+          autocomplete="password"
           required
         ></b-form-input>
       </b-form-group>
@@ -58,6 +62,7 @@
 
       <b-button type="submit" variant="primary">Sign Up</b-button>
     </b-form>
+
     <div v-if="qrImagePath" class="row justify-content-center">
       <qrcode-vue :size="400" :value="qrImagePath" level="H" />
       <h2 class="text-center">Signup successful - Scan the QR code with your favorite 2FA app</h2>
