@@ -6,7 +6,7 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav>
+      <b-navbar-nav v-if="this.$store.state.user.token">
         <b-nav-item to="/">Home</b-nav-item>
         <b-nav-item to="/passwords">Passwords</b-nav-item>
         <b-nav-item to="/files">Files</b-nav-item>
@@ -18,7 +18,7 @@
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <!-- {{this.store.name}} -->
+            {{$store.state.user.name}}
           </template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item @click="logoutVue">Sign Out</b-dropdown-item>
