@@ -4,16 +4,16 @@
     <h2>Create new password</h2>
   </div>
 
-  <div>
+  <div class="row justify-content-center">
     <b-alert v-model="error" variant="danger" dismissible>Request failed</b-alert>
     <b-alert v-model="successful" variant="success" dismissible>Request successful!</b-alert>
   </div>
 
-  <div @submit="onCreate" class="row justify-content-center">
-    <b-form autocomplete="off" inline>
-      <label class="sr-only" for="inline-form-input-website">Website</label>
+  <div class="row justify-content-center">
+    <b-form @submit.prevent="onCreate" autocomplete="off" inline>
+      <label class="sr-only" for="create-form-input-website">Website</label>
       <b-form-input
-        id="inline-form-input-website"
+        id="create-form-input-website"
         class="mb-2 mr-sm-2 mb-sm-0"
         placeholder="URL related to password"
         v-model="createForm.website"
@@ -21,31 +21,130 @@
         autocomplete="off"
       ></b-form-input>
 
-      <label class="sr-only" for="inline-form-input-username">Username</label>
+      <label class="sr-only" for="create-form-input-username">Username</label>
       <b-form-input
         class="mb-2 mr-sm-2 mb-sm-0"
-        id="inline-form-input-username"
+        id="create-form-input-username"
         placeholder="Username"
         v-model="createForm.username"
         required
         autocomplete="off"
       ></b-form-input>
 
-      <label class="sr-only" for="inline-form-input-password">Password</label>
+      <label class="sr-only" for="create-form-input-password">Password</label>
       <b-form-input
-      class="mb-2 mr-sm-2 mb-sm-0"
-      id="inline-form-input-password"
-      placeholder="Password"
-      type="password"
-      v-model="createForm.password"
-      required
-      autocomplete="off"
-    ></b-form-input>
+        class="mb-2 mr-sm-2 mb-sm-0"
+        id="create-form-input-password"
+        placeholder="Password"
+        type="password"
+        v-model="createForm.password"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
 
       <b-button type="submit" variant="primary">Save</b-button>
     </b-form>
   </div>
 
+  <div class="row justify-content-center mt-4">
+    <h2>Retrieve a certain password</h2>
+  </div>
+  <div class="row justify-content-center">
+    <b-form @submit.prevent="onRetrieveSingle" autocomplete="off" inline>
+      <label class="sr-only" for="retrieve-single-form-input-website">Website</label>
+      <b-form-input
+        id="retrieve-single-form-input-website"
+        class="mb-2 mr-sm-2 mb-sm-0"
+        placeholder="URL related to password"
+        v-model="retrieveSingleForm.website"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
+      <label class="sr-only" for="retrieve-single-form-input-username">Username</label>
+      <b-form-input
+        class="mb-2 mr-sm-2 mb-sm-0"
+        id="retrieve-single-form-input-username"
+        placeholder="Username"
+        v-model="retrieveSingleForm.username"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
+      <b-button type="submit" variant="primary">Retrieve</b-button>
+    </b-form>
+  </div>
+
+  <div class="row justify-content-center mt-4">
+    <h2>Retrieve passwords from a webpage</h2>
+  </div>
+  <div class="row justify-content-center">
+    <b-form @submit.prevent="onRetrieveSome" autocomplete="off" inline>
+      <label class="sr-only" for="retrieve-some-form-input-website">Website</label>
+      <b-form-input
+        id="retrieve-some-form-input-website"
+        class="mb-2 mr-sm-2 mb-sm-0"
+        placeholder="URL related to password"
+        v-model="retrieveSomeForm.website"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
+      <b-button type="submit" variant="primary">Retrieve</b-button>
+    </b-form>
+  </div>
+
+  <div class="row justify-content-center mt-4">
+    <h2>Download all passwords</h2>
+  </div>
+  <div class="row justify-content-center">
+    <b-form @submit.prevent="onRetrieveAll" autocomplete="off" inline>
+      <label class="sr-only" for="retrieve-all-form-input-website">Website</label>
+      <b-form-input
+        id="retrieve-all-form-input-website"
+        class="mb-2 mr-sm-2 mb-sm-0"
+        placeholder="TOTP code"
+        v-model="retrieveAllForm.totp"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
+      <b-button type="submit" variant="primary">Retrieve</b-button>
+    </b-form>
+  </div>
+
+
+  <b-modal v-model="passwordRetrieved" id="modal-password" centered title="Your password">
+    <p class="my-4">{{retrievedPassword}}</p>
+    <template #modal-footer>
+        <div class="w-100">
+          <b-button
+            variant="primary"
+            size="sm"
+            class="float-right"
+            @click="retrievedPassword=''; passwordRetrieved=false"
+          >
+            Close
+          </b-button>
+        </div>
+      </template>
+  </b-modal>
+  <b-modal v-model="passwordsRetrieved" id="modal-passwords" centered :title="'Passwords from ' + retrieveSomeForm.website">
+    <b-table striped hover :items="retrievedPasswords"></b-table>
+    <template #modal-footer>
+        <div class="w-100">
+          <b-button
+            variant="primary"
+            size="sm"
+            class="float-right"
+            @click="retrievedPasswords=[]; passwordsRetrieved=false"
+          >
+            Close
+          </b-button>
+        </div>
+      </template>
+  </b-modal>
 </div>
 </template>
 
@@ -61,12 +160,25 @@ export default {
         website: 'www.google.es',
         username: 'asdf',
         password: 'asdf'
-      }
+      },
+      retrieveSingleForm: {
+        website: 'www.google.es',
+        username: 'asdf',
+      },
+      retrieveSomeForm: {
+        website: 'www.google.es',
+      },
+      retrieveAllForm: {
+        totp: '',
+      },
+      retrievedPassword: '',
+      retrievedPasswords: [],
+      passwordRetrieved: false,
+      passwordsRetrieved: false,
     }
   },
   methods: {
-    async onCreate(event) {
-      event.preventDefault();
+    async onCreate() {
       this.error = false;
       
       const encryptedPassword = await Crypt.encryptAES(this.createForm.password, this.$store.state.user.dataKey);
@@ -88,7 +200,91 @@ export default {
       } else {
         this.error = true;
       }
-    }
+    },
+    async onRetrieveSingle() {
+      this.error = false;
+      this.successful = false;
+
+      const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/' + this.retrieveSingleForm.website + '/' + this.retrieveSingleForm.username, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.$store.state.user.token,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const decodedPassword = Crypt.decodeBase64(json.password);
+        const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
+        this.retrievedPassword = decryptedPassword;
+        this.$bvModal.show('modal-password');
+      } else {
+        this.error = true;
+      }
+    },
+    async onRetrieveSome() {
+      this.error = false;
+      this.successful = false;
+
+      const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/' + this.retrieveSomeForm.website, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.$store.state.user.token,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        this.retrievedPasswords = [];
+        for (let [username, passObj] of Object.entries(json)) {
+          const decodedPassword = Crypt.decodeBase64(passObj/*.password*/);
+          const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
+          this.retrievedPasswords.push({
+            username: username,
+            password: decryptedPassword,
+          });
+        }
+        this.$bvModal.show('modal-passwords');
+      } else {
+        this.error = true;
+      }
+    },
+    async onRetrieveAll() {
+      this.error = false;
+      this.successful = false;
+
+      const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.$store.state.user.token,
+          'X-Totp': this.retrieveAllForm.totp,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        for (let [website, websiteObj] of Object.entries(json)) {
+          for (let [username, password] of Object.entries(websiteObj)) {
+            const decodedPassword = Crypt.decodeBase64(password);
+            const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
+            json[website][username] = decryptedPassword;
+          }
+        }
+        let text = JSON.stringify(json);
+        let filename = 'passwords.json';
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+        document.body.removeChild(element);   
+      } else {
+        this.error = true;
+      }
+    },
   }
 }
 </script>
