@@ -112,7 +112,7 @@ export default new Vuex.Store({
                         token: r.token,
                         privateKey: decPrivKey,
                         publicKey: decPublicKey,
-                        dataKey: dataKey,
+                        dataKey,
                     }
                     commit('setUser', user);
                     return true;

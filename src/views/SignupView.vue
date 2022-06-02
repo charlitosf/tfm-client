@@ -5,7 +5,7 @@
     </div>
 
     <div>
-      <b-alert v-model="error" variant="danger" dismissible>Signun failed</b-alert>
+      <b-alert v-model="error" variant="danger" dismissible>Signup failed</b-alert>
       <b-alert v-model="successful" variant="success" dismissible>Signup successful!</b-alert>
     </div>
 
