@@ -14,14 +14,14 @@
       </b-navbar-nav>
 
       <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav class="ml-auto" v-if="this.$store.state.user.token">
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
             <!-- {{this.store.name}} -->
           </template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+          <b-dropdown-item @click="logoutVue">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -44,32 +44,15 @@ export default {
   store,
   methods: {
     ...mapActions([
-      'setUser',
-      'unsetUser'
-    ]) 
+      'logout'
+    ]),
+    async logoutVue() {
+      await this.logout()
+      this.$router.replace('/login')
+    }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
 </style>

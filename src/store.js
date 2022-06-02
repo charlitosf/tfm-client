@@ -123,6 +123,21 @@ export default new Vuex.Store({
             } catch (error) {
                 return false;
             }
+        },
+        async logout({ commit }) {
+            const token = this.state.user.token;
+            commit('unsetUser');
+            try {
+                const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/auth/logout", {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    }
+                })
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
         }
     },
 })
