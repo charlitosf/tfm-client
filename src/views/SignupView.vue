@@ -3,8 +3,14 @@
     <div class="row justify-content-center">
       <h1>Signup</h1>
     </div>
+
+    <div>
+      <b-alert v-model="error" variant="danger" dismissible>Login failed</b-alert>
+      <b-alert v-model="successful" variant="success" dismissible>Login successful!</b-alert>
+    </div>
+
     
-    <b-form @submit="onSubmit">
+    <b-form @submit="onSubmit" v-if="!qrImagePath">
       <b-form-group id="input-group-3" label="Full name:" label-for="input-3">
         <b-form-input
           id="input-3"
@@ -49,34 +55,57 @@
         ></b-form-input>
       </b-form-group>
 
+
       <b-button type="submit" variant="primary">Sign Up</b-button>
     </b-form>
+    <div v-if="qrImagePath" class="row justify-content-center">
+      <qrcode-vue :size="400" :value="qrImagePath" level="H" />
+      <h2 class="text-center">Signup successful - Scan the QR code with your favorite 2FA app</h2>
+    </div>
+    <b-button @click="backToLogin">Back to login</b-button>
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import QrcodeVue from 'qrcode.vue'
 
-  export default {
-    data() {
-      return {
-        form: {
-          email: '',
-          name: '',
-          username: '',
-          password: '',
-        },
+export default {
+  data() {
+    return {
+      form: {
+        email: 'asdf@asdf',
+        name: 'asdf',
+        username: 'asdf',
+        password: 'asdf',
+      },
+      qrImagePath: '',
+      error: false,
+      successful: false,
+    }
+  },
+  methods: {
+    ...mapActions([
+      'signup',
+    ]),
+    async onSubmit(event) {
+      event.preventDefault()
+      const res = await this.signup(this.form)
+      if (res) {
+        this.qrImagePath = res;
+        this.successful = true;
+        this.error = false;
+      } else {
+        this.successful = false;
+        this.error = true
       }
     },
-    methods: {
-      ...mapActions([
-        'signup',
-      ]),
-      onSubmit(event) {
-        event.preventDefault()
-        
-        this.signup(this.form)
-      }
+    backToLogin() {
+      this.$router.replace('/login')
     }
+  },
+  components: {
+    QrcodeVue
   }
+}
 </script>

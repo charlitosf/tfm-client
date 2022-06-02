@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-import CryptoES from 'crypto-es'
+import Crypt from '@/lib/crypt.js'
 
 
 export default new Vuex.Store({
@@ -23,6 +23,9 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        doNothing() {
+
+        },
         setUser(state, user) {
             state.user = user
         },
@@ -38,41 +41,39 @@ export default new Vuex.Store({
     },
     actions: {
         async signup({ commit }, user) {
-            const hash = CryptoES.SHA256("xdd")
-            const hash2 = Array.from(new Uint8Array(await window.crypto.subtle.digest('SHA-256', (new TextEncoder()).encode("xdd")))).map(b => b.toString(16).padStart(2, '0')).join('')
-            commit('setUser', user)
-            console.log(hash.toString());
-            console.log(hash2);
-            let keyPair = await window.crypto.subtle.generateKey(
-                {
-                  name: "RSA-OAEP",
-                  modulusLength: 4096,
-                  publicExponent: new Uint8Array([1, 0, 1]),
-                  hash: "SHA-256"
-                },
-                true,
-                ["encrypt", "decrypt"]
-              );
-            let publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            let privateKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
-            console.log(publicKey);
-            console.log(privateKey);
-            // try {
-            //     const response = await Vue.axios.post(process.env.VUE_APP_REMOTE_HOST, {
-            //         password: loginKey,
-            //         username: user.username,
-            //         name: user.name,
-            //         email: user.email,
-            //         publicKey: encodedPublicKey,
-            //         privateKey: encryptedPrivateKey,
-            //     })
-            //     console.log(response);
-            //     commit('setUser', response.data)
-            //     return response.data
-            // } catch (error) {
-            //     console.log(error);
-            //     throw error
-            // }
+            const passHash = await Crypt.digestSHA512(user.password);
+            let loginK = passHash.slice(0, 32);
+            let dataKey = passHash.slice(32);
+
+            let loginKey = await Crypt.createKeyFromRaw(loginK);
+            dataKey = await Crypt.createKeyFromRaw(dataKey);
+            loginKey = await Crypt.exportKey(loginKey);
+            
+            const keyPair = await Crypt.generateRSAKeyPair()
+            const encPubKey = await Crypt.exportRSAPublicKey(keyPair.publicKey);
+            const ciphPrivKey = await Crypt.encodeRSAPrivateKey(keyPair.privateKey, dataKey);
+            try {
+                const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/auth/signup", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        password: loginKey,
+                        username: user.username,
+                        name: user.name,
+                        email: user.email,
+                        publicKey: encPubKey,
+                        privateKey: ciphPrivKey,
+                    })
+                })
+                const r = await response.json();
+                commit('doNothing');
+                return r.otp;
+            } catch (error) {
+                console.log(error);
+                return false;
+            }
         }
     },
 })
