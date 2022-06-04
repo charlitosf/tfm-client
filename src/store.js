@@ -93,12 +93,12 @@ export default new Vuex.Store({
                 const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/auth/login", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Totp': credentials.totp
                     },
                     body: JSON.stringify({
                         password: loginKey,
                         username: credentials.username,
-                        totp: credentials.totp,
                     })
                 })
                 if (response.ok) {
