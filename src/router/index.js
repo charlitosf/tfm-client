@@ -5,6 +5,7 @@ import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
 import PasswordsView from '../views/PasswordsView.vue'
 import FilesView from '../views/FilesView.vue'
+import ProfileView from '../views/ProfileView.vue'
 import store from '@/store.js'
 
 Vue.use(VueRouter)
@@ -42,6 +43,11 @@ const routes = [
     path: '/files',
     name: 'files',
     component: FilesView
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: ProfileView
   }
 ]
 
