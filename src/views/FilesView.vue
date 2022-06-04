@@ -35,6 +35,7 @@
       <b-button
         variant="danger"
         @click="onDeleteFile(data.item.name)"
+        class="ml-2"
       >
         Delete
       </b-button>
@@ -50,7 +51,16 @@ export default {
   data() {
     return {
       filenames: [],
-      fields: ['name', 'actions'],
+      fields: [{
+        key: 'name',
+        label: 'Name',
+        sortable: true,
+      }, {
+        key: 'actions',
+        label: 'Actions',
+        sortable: false,
+        class: 'actionsColumn',
+      }],
       filenamesRetrieved: false,
       successful: false,
       error: false,
@@ -58,10 +68,8 @@ export default {
   },
   methods: {
     download(data, filename) {
-      // credit: https://www.bitdegree.org/learn/javascript-download
-      let text = JSON.stringify(data);
       let element = document.createElement('a');
-      element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(data));
       element.setAttribute('download', filename);
 
       element.style.display = 'none';
@@ -83,6 +91,7 @@ export default {
       
       reader.onload = async (evt) =>  {
         const text = evt.target.result;
+        console.log(text);
         // Encrypt and encode file content
         const encrypted = await Crypt.encryptAES(text, this.$store.state.user.dataKey);
         const encoded = Crypt.encodeBase64(encrypted);
@@ -187,3 +196,9 @@ export default {
   },
 }
 </script>
+
+<style>
+.actionsColumn {
+  width: 200px;
+}
+</style>
