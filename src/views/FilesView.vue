@@ -88,12 +88,13 @@ export default {
       }
       let reader = new FileReader();
       reader.readAsText(file, "UTF-8");
+      // reader.readAsArrayBuffer(file);
       
       reader.onload = async (evt) =>  {
         const text = evt.target.result;
-        console.log(text);
         // Encrypt and encode file content
         const encrypted = await Crypt.encryptAES(text, this.$store.state.user.dataKey);
+        // const encrypted = await Crypt.encryptAESBuffer(new Uint8Array(text), this.$store.state.user.dataKey);
         const encoded = Crypt.encodeBase64(encrypted);
 
         // Upload encoded file to server
@@ -160,6 +161,7 @@ export default {
           const json = await response.json();
           const decoded = Crypt.decodeBase64(json.content);
           const decrypted = await Crypt.decryptAES(decoded, this.$store.state.user.dataKey);
+          // const decrypted = await Crypt.decryptAESBuffer(decoded, this.$store.state.user.dataKey);
           this.download(decrypted, json.name);
         } else {
           this.error = true;

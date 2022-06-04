@@ -72,6 +72,31 @@ export default class Crypt {
         return totalBytes;
     }
 
+    // Encrypts a Uint8Array using the AES-256 algorithm with subtle crypto.
+    // @param {ArrayBuffer} bytes - The bytes to encrypt.
+    // @param {CryptoKey} key - The key to use for encryption.
+    // @returns {Uint8Array} The encrypted bytes.
+    static async encryptAESBuffer(bytes, key) {
+        const counter = crypto.getRandomValues(new Uint8Array(AES_IV_LENGTH));
+        // Concat counter and bytes
+        const totalBytes = new Uint8Array(counter.length + bytes.length);
+        totalBytes.set(counter);
+        
+        let ciphertext = await crypto.subtle.encrypt(
+            {
+                name: "AES-CTR",
+                counter,
+                length: AES_IV_LENGTH * 4,
+            },
+            key,
+            bytes
+        );
+        ciphertext = new Uint8Array(ciphertext);
+        totalBytes.set(ciphertext, counter.length);
+        return totalBytes;
+    }
+
+
     // Decrypts a string using the AES-256 algorithm with subtle crypto.
     // @param {string} str - The bytes to decrypt.
     // @param {string} key - The key to use for decryption.
@@ -87,6 +112,23 @@ export default class Crypt {
             bytes.slice(AES_IV_LENGTH)
         );
         return this.utf8Decode(new Uint8Array(plaintext));
+    }
+
+    // Decrypts a Uint8Array using the AES-256 algorithm with subtle crypto.
+    // @param {Uint8Array} bytes - The bytes to decrypt.
+    // @param {CryptoKey} key - The key to use for decryption.
+    // @returns {Uint8Array} The decrypted bytes.
+    static async decryptAESBuffer(bytes, key) {
+        const plaintext = await crypto.subtle.decrypt(
+            {
+                name: "AES-CTR",
+                counter: bytes.slice(0, AES_IV_LENGTH),
+                length: 64,
+            },
+            key,
+            bytes.slice(AES_IV_LENGTH)
+        );
+        return new Uint8Array(plaintext);
     }
 
     // Generate a pair of RSA keys
