@@ -221,8 +221,14 @@ export default {
         const json = await res.json();
         const decodedPassword = Crypt.decodeBase64(json.password);
         const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
-        this.retrievedPassword = decryptedPassword;
-        this.$bvModal.show('modal-password');
+        const decodedSignature = Crypt.decodeBase64(json.signature);
+        const verified = await Crypt.verifyRSA(json.password, decodedSignature, this.$store.state.user.publicKey);
+        if (verified) {
+          this.retrievedPassword = decryptedPassword;
+          this.passwordRetrieved = true;
+        } else {
+          this.error = true;
+        }
       } else {
         this.error = true;
       }
@@ -242,14 +248,23 @@ export default {
         const json = await res.json();
         this.retrievedPasswords = [];
         for (let [username, passObj] of Object.entries(json)) {
-          const decodedPassword = Crypt.decodeBase64(passObj/*.password*/);
+          const decodedPassword = Crypt.decodeBase64(passObj.password);
           const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
-          this.retrievedPasswords.push({
-            username: username,
-            password: decryptedPassword,
-          });
+          const decodedSignature = Crypt.decodeBase64(passObj.signature);
+          const verified = await Crypt.verifyRSA(passObj.password, decodedSignature, this.$store.state.user.publicKey);
+          if (verified) {
+            this.retrievedPasswords.push({
+              username: username,
+              password: decryptedPassword,
+            });
+          } else {
+            this.retrievedPasswords.push({
+              username: username,
+              password: '<<<PASSWORD INTEGRITY CHECK FAILED>>>',
+            });
+          }
         }
-        this.$bvModal.show('modal-passwords');
+        this.passwordsRetrieved = true;
       } else {
         this.error = true;
       }
@@ -269,10 +284,16 @@ export default {
       if (res.ok) {
         const json = await res.json();
         for (let [website, websiteObj] of Object.entries(json)) {
-          for (let [username, password] of Object.entries(websiteObj)) {
-            const decodedPassword = Crypt.decodeBase64(password);
+          for (let [username, passwordObj] of Object.entries(websiteObj)) {
+            const decodedPassword = Crypt.decodeBase64(passwordObj.password);
             const decryptedPassword = await Crypt.decryptAES(decodedPassword, this.$store.state.user.dataKey);
-            json[website][username] = decryptedPassword;
+            const decodedSignature = Crypt.decodeBase64(passwordObj.signature);
+            const verified = await Crypt.verifyRSA(passwordObj.password, decodedSignature, this.$store.state.user.publicKey);
+            if (verified) {
+              json[website][username] = decryptedPassword;
+            } else {
+              json[website][username] = '<<<PASSWORD INTEGRITY CHECK FAILED>>>';
+            }
           }
         }
         let text = JSON.stringify(json);
