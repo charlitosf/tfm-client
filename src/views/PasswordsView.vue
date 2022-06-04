@@ -1,7 +1,7 @@
 <template>
 <div class="container">
   <div class="row justify-content-center">
-    <h2>Create new password</h2>
+    <h2>Create or update new password</h2>
   </div>
 
   <div class="row justify-content-center">
@@ -44,11 +44,12 @@
 
 
       <b-button type="submit" variant="primary">Save</b-button>
+      <b-button @click="onUpdate" type="button" variant="warning">Update</b-button>
     </b-form>
   </div>
 
   <div class="row justify-content-center mt-4">
-    <h2>Retrieve a certain password</h2>
+    <h2>Retrieve or delete a certain password</h2>
   </div>
   <div class="row justify-content-center">
     <b-form @submit.prevent="onRetrieveSingle" autocomplete="off" inline>
@@ -73,6 +74,7 @@
       ></b-form-input>
 
       <b-button type="submit" variant="primary">Retrieve</b-button>
+      <b-button @click="onDelete" type="button" variant="danger">Delete</b-button>
     </b-form>
   </div>
 
@@ -183,6 +185,8 @@ export default {
       
       const encryptedPassword = await Crypt.encryptAES(this.createForm.password, this.$store.state.user.dataKey);
       const encodedPassword = Crypt.encodeBase64(encryptedPassword);
+      const signature = await Crypt.signRSA(encodedPassword, this.$store.state.user.privateKey);
+      const encodedSignature = Crypt.encodeBase64(signature);
 
       const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/' + this.createForm.website, {
         method: 'POST',
@@ -193,6 +197,7 @@ export default {
         body: JSON.stringify({
           username: this.createForm.username,
           password: encodedPassword,
+          signature: encodedSignature,
         }),
       });
       if (res.ok) {
@@ -281,6 +286,56 @@ export default {
 
         element.click();
         document.body.removeChild(element);   
+      } else {
+        this.error = true;
+      }
+    },
+    async onDelete() {
+      this.error = false;
+      this.successful = false;
+
+      const signature = await Crypt.signRSA(this.retrieveSingleForm.website + this.retrieveSingleForm.username, this.$store.state.user.privateKey);
+      const encodedSignature = Crypt.encodeBase64(signature);
+
+      const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/' + this.retrieveSingleForm.website + '/' + this.retrieveSingleForm.username, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.$store.state.user.token,
+        },
+        body: JSON.stringify({
+          signature: encodedSignature,
+        }),
+      });
+      if (res.ok) {
+        this.successful = true;
+      } else {
+        this.error = true;
+      }
+    },
+    async onUpdate() {
+      this.error = false;
+      this.successful = false;
+
+      const encryptedPassword = await Crypt.encryptAES(this.createForm.password, this.$store.state.user.dataKey);
+      const encodedPassword = Crypt.encodeBase64(encryptedPassword);
+
+      const signature = await Crypt.signRSA(encodedPassword, this.$store.state.user.privateKey);
+      const encodedSignature = Crypt.encodeBase64(signature);
+
+      const res = await fetch(process.env.VUE_APP_REMOTE_HOST + '/passwords/' + this.createForm.website + '/' + this.createForm.username, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.$store.state.user.token,
+        },
+        body: JSON.stringify({
+          password: encodedPassword,
+          signature: encodedSignature,
+        }),
+      });
+      if (res.ok) {
+        this.successful = true;
       } else {
         this.error = true;
       }

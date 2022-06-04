@@ -135,13 +135,13 @@ export default class Crypt {
     static async generateRSAKeyPair() {
         return crypto.subtle.generateKey(
             {
-                name: "RSA-OAEP",
+                name: "RSASSA-PKCS1-v1_5",
                 modulusLength: 2048,
                 publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
                 hash: { name: "SHA-256" },
             },
             true,
-            ["encrypt", "decrypt"]
+            ["sign", "verify"]
         );
     }
 
@@ -175,6 +175,36 @@ export default class Crypt {
             bytes
         );
         return this.utf8Decode(new Uint8Array(plaintext));
+    }
+
+    // Sign a string using the RSA PKCS1 V1.5 algorithm with subtle crypto.
+    // @param {string} str - The string to sign encoded in utf8.
+    // @param {CryptoKey} key - The private key to use for signing.
+    // @returns {Uint8Array} The signature.
+    static async signRSA(str, key) {
+        const bytes = this.utf8Encode(str);
+        const signature = await crypto.subtle.sign(
+            "RSASSA-PKCS1-v1_5",
+            key,
+            bytes
+        );
+        return new Uint8Array(signature);
+    }
+
+    // Verify a string using the RSA PKCS1 V1.5 algorithm with subtle crypto.
+    // @param {string} str - The string to verify encoded in utf8.
+    // @param {Uint8Array} signature - The signature to verify.
+    // @param {CryptoKey} key - The public key to use for verification.
+    // @returns {boolean} True if the signature is valid, false otherwise.
+    static verifyRSA(str, signature, key) {
+        const bytes = this.utf8Encode(str);
+        const signatureBytes = new Uint8Array(signature);
+        return crypto.subtle.verify(
+            "RSASSA-PKCS1-v1_5",
+            key,
+            signatureBytes,
+            bytes
+        );
     }
 
     // Digest using SHA-512 with subtle crypto.
@@ -211,11 +241,11 @@ export default class Crypt {
             "pkcs8",
             decodedKey,
             {
-                name: "RSA-OAEP",
+                name: "RSASSA-PKCS1-v1_5",
                 hash: "SHA-256" ,
             },
             true,
-            ["decrypt"]
+            ["sign"]
         );
     }
 
@@ -235,11 +265,11 @@ export default class Crypt {
             "spki",
             decodedKey,
             {
-                name: "RSA-OAEP",
+                name: "RSASSA-PKCS1-v1_5",
                 hash: "SHA-256",
             },
             false,
-            ["encrypt"]
+            ["verify"]
         );
     }
 
