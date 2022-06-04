@@ -48,8 +48,8 @@
 
       <b-button type="submit" variant="primary">Submit</b-button>
     </b-form>
+    <b-button class="mt-2" type="button" to="/signup" variant="info">Signup</b-button>
     
-    <router-link to="/signup">Signup</router-link>
   </div>
 </template>
 

@@ -67,7 +67,7 @@
       <qrcode-vue :size="400" :value="qrImagePath" level="H" />
       <h2 class="text-center">Signup successful - Scan the QR code with your favorite 2FA app</h2>
     </div>
-    <b-button @click="backToLogin">Back to login</b-button>
+    <b-button class="mt-2" @click="backToLogin">Back to login</b-button>
   </div>
 </template>
 
