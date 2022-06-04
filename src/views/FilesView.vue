@@ -97,6 +97,10 @@ export default {
         // const encrypted = await Crypt.encryptAESBuffer(new Uint8Array(text), this.$store.state.user.dataKey);
         const encoded = Crypt.encodeBase64(encrypted);
 
+        // Sign file content
+        const signature = await Crypt.signRSA(encoded, this.$store.state.user.privateKey);
+        const encodedSignature = Crypt.encodeBase64(signature);
+
         // Upload encoded file to server
         try {
           const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/files/", {
@@ -108,6 +112,7 @@ export default {
             body: JSON.stringify({
                 name: file.name,
                 content: encoded,
+                signature: encodedSignature,
             })
           })
           if (response.ok) {
@@ -162,7 +167,15 @@ export default {
           const decoded = Crypt.decodeBase64(json.content);
           const decrypted = await Crypt.decryptAES(decoded, this.$store.state.user.dataKey);
           // const decrypted = await Crypt.decryptAESBuffer(decoded, this.$store.state.user.dataKey);
-          this.download(decrypted, json.name);
+
+          // Verify signature
+          const signature = Crypt.decodeBase64(json.signature);
+          const verified = await Crypt.verifyRSA(json.content, signature, this.$store.state.user.publicKey);
+          if (verified) {
+            this.download(decrypted, filename);
+          } else {
+            this.error = true;
+          }
         } else {
           this.error = true;
         }
@@ -174,6 +187,10 @@ export default {
       this.error = false;
       this.successful = false;
 
+      // Sign filename
+      const signature = await Crypt.signRSA(filename, this.$store.state.user.privateKey);
+      const encodedSignature = Crypt.encodeBase64(signature);
+
       try {
         const response = await fetch(process.env.VUE_APP_REMOTE_HOST + "/files/" + filename, {
           method: 'DELETE',
@@ -181,6 +198,9 @@ export default {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + this.$store.state.user.token,
           },
+          body: JSON.stringify({
+            signature: encodedSignature,
+          })
         })
         if (response.ok) {
           this.onRetrieveFiles();
