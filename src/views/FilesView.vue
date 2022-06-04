@@ -1,6 +1,10 @@
 <template>
 <div class="container">
   <div class="row justify-content-center">
+    <b-alert v-model="error" variant="danger" dismissible>Request failed</b-alert>
+    <b-alert v-model="successful" variant="success" dismissible>Request successful!</b-alert>
+  </div>
+  <div class="row justify-content-center">
     <h2>Upload file</h2>
   </div>
   <div class="row justify-content-center">
@@ -13,10 +17,6 @@
       @change="onUpload"
     >
   </div>
-  <div class="row justify-content-center">
-    <b-alert v-model="error" variant="danger" dismissible>Request failed</b-alert>
-    <b-alert v-model="successful" variant="success" dismissible>Request successful!</b-alert>
-  </div>
 
   <div class="row justify-content-center mt-4">
     <h2>Stored files</h2>
@@ -24,7 +24,7 @@
   <div class="row justify-content-center">
     <b-button @click="onRetrieveFiles">Reload</b-button>
   </div>
-  <b-table striped hover :items="filenames" :fields="fields">
+  <b-table class="mt-2" striped hover :items="filenames" :fields="fields">
     <template #cell(actions)="data">
       <b-button
         variant="primary"

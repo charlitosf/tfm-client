@@ -1,12 +1,12 @@
 <template>
 <div class="container">
   <div class="row justify-content-center">
-    <h2>Create or update new password</h2>
-  </div>
-
-  <div class="row justify-content-center">
     <b-alert v-model="error" variant="danger" dismissible>Request failed</b-alert>
     <b-alert v-model="successful" variant="success" dismissible>Request successful!</b-alert>
+  </div>
+  
+  <div class="row justify-content-center">
+    <h2>Create or update new password</h2>
   </div>
 
   <div class="row justify-content-center">
@@ -44,7 +44,7 @@
 
 
       <b-button type="submit" variant="primary">Save</b-button>
-      <b-button @click="onUpdate" type="button" variant="warning">Update</b-button>
+      <b-button @click="onUpdate" type="button" variant="warning" class="ml-2">Update</b-button>
     </b-form>
   </div>
 
@@ -74,7 +74,7 @@
       ></b-form-input>
 
       <b-button type="submit" variant="primary">Retrieve</b-button>
-      <b-button @click="onDelete" type="button" variant="danger">Delete</b-button>
+      <b-button @click="onDelete" type="button" variant="danger" class="ml-2">Delete</b-button>
     </b-form>
   </div>
 

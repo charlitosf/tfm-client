@@ -7,33 +7,17 @@
     <h1>Your profile</h1>
   </div>
   <div class="row">
-    Name: {{ name }}
-  </div>
-  <div class="row">
-    Username: {{ username }}
-  </div>
-  <div class="row">
-    Email: {{ email }}
+    <div class="col">
+      Name: {{ name }}
+    </div>
+    <div class="col">
+      Username: {{ username }}
+    </div>
+    <div class="col">
+      Email: {{ email }}
+    </div>
   </div>
 
-  <div class="row justify-content-center mt-4">
-    <h2>Delete User</h2>
-  </div>
-  <div class="row justify-content-center">
-    <b-form @submit.prevent="onDeleteUser" autocomplete="off" inline>
-      <label class="sr-only" for="delete-form-input-user">Totp</label>
-      <b-form-input
-        id="delete-form-input-user"
-        class="mb-2 mr-sm-2 mb-sm-0"
-        placeholder="TOTP code"
-        v-model="deleteForm.totp"
-        required
-        autocomplete="off"
-      ></b-form-input>
-
-      <b-button type="submit" variant="danger">Delete</b-button>
-    </b-form>
-  </div>
   <div class="row justify-content-center mt-4">
     <h2>Change password</h2>
   </div>
@@ -60,6 +44,24 @@
       ></b-form-input>
 
       <b-button type="submit" variant="warning">Change</b-button>
+    </b-form>
+  </div>
+  <div class="row justify-content-center mt-4">
+    <h2>Delete User</h2>
+  </div>
+  <div class="row justify-content-center">
+    <b-form @submit.prevent="onDeleteUser" autocomplete="off" inline>
+      <label class="sr-only" for="delete-form-input-user">Totp</label>
+      <b-form-input
+        id="delete-form-input-user"
+        class="mb-2 mr-sm-2 mb-sm-0"
+        placeholder="TOTP code"
+        v-model="deleteForm.totp"
+        required
+        autocomplete="off"
+      ></b-form-input>
+
+      <b-button type="submit" variant="danger">Delete</b-button>
     </b-form>
   </div>
 </div>
