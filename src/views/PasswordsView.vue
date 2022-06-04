@@ -160,12 +160,12 @@ export default {
       successful: false,
       createForm: {
         website: 'www.google.es',
-        username: 'asdf',
-        password: 'asdf'
+        username: 'test',
+        password: ''
       },
       retrieveSingleForm: {
         website: 'www.google.es',
-        username: 'asdf',
+        username: 'test',
       },
       retrieveSomeForm: {
         website: 'www.google.es',

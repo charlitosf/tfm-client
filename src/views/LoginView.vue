@@ -58,9 +58,9 @@
     data() {
       return {
         form: {
-          username: 'asdf',
-          password: 'asdf',
-          totp: 'asdf'
+          username: 'charlitosf',
+          password: '',
+          totp: ''
         },
         error: false,
       }

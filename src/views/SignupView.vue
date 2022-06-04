@@ -79,10 +79,10 @@ export default {
   data() {
     return {
       form: {
-        email: 'asdf@asdf',
-        name: 'asdf',
-        username: 'asdf',
-        password: 'asdf',
+        email: 'carlos@ferrus.es',
+        name: 'Carlos Ferrus',
+        username: 'charlitosf',
+        password: '',
       },
       qrImagePath: '',
       error: false,
