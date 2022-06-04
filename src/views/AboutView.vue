@@ -1,5 +1,7 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="container">
+    <div class="row justify-content-center">
+      <h1>Made by Carlos Ferrús Ferri</h1>
+    </div>
   </div>
 </template>

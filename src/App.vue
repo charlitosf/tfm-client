@@ -6,10 +6,10 @@
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav v-if="this.$store.state.user.token">
-        <b-nav-item to="/">Home</b-nav-item>
-        <b-nav-item to="/passwords">Passwords</b-nav-item>
-        <b-nav-item to="/files">Files</b-nav-item>
+      <b-navbar-nav>
+        <b-nav-item v-if="this.$store.state.user.token" to="/">Home</b-nav-item>
+        <b-nav-item v-if="this.$store.state.user.token" to="/passwords">Passwords</b-nav-item>
+        <b-nav-item v-if="this.$store.state.user.token" to="/files">Files</b-nav-item>
         <b-nav-item to="/about">About</b-nav-item>
       </b-navbar-nav>
 

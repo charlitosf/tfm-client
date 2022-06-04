@@ -56,7 +56,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  if (to.name !== 'login' && to.name !== 'signup' && store.state.user.token === '') {
+  if (!['login', 'signup', 'about'].includes(to.name) && store.state.user.token === '') {
     next({ name: 'login' })
   } else next();
 })
