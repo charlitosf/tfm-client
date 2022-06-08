@@ -81,7 +81,7 @@ export default {
       form: {
         email: 'carlos@ferrus.es',
         name: 'Carlos Ferrus',
-        username: 'charlitosf',
+        username: 'carlos.ferrus',
         password: '',
       },
       qrImagePath: '',
